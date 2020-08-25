@@ -37,7 +37,8 @@ i = redis.llen(args.query)
 while i > 0:
 
     data = json.loads(redis.lpop(args.query)) 
-
+    
+    isRetweet = False
     if 'RT @pdxpolicelog: ' in str(data['text']):
         isRetweet = True
 
