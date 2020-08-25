@@ -37,33 +37,38 @@ i = redis.llen(args.query)
 while i > 0:
 
     data = json.loads(redis.lpop(args.query)) 
-    datetime_object = datetime.strptime(json.loads(data['created_at']), '%Y-%m-%dT%H:%M:%S')
 
-    utc_datetime = pytz.utc.localize(datetime_object)
+    if 'RT @pdxpolicelog: ' in str(data['text']):
+        isRetweet = True
 
-    pst_datetime = utc_datetime.astimezone(pytz.timezone("America/Los_Angeles"))
-    pst_date = datetime.strftime(pst_datetime, '%Y-%m-%d %I:%M %p')
+    if isRetweet != True:
+        datetime_object = datetime.strptime(json.loads(data['created_at']), '%Y-%m-%dT%H:%M:%S')
 
-    at = 'at'
-    startBracket = '['
+        utc_datetime = pytz.utc.localize(datetime_object)
 
-    atIndex  = data['text'].find(at)
-    startBracketIndex = data['text'].find(startBracket)
+        pst_datetime = utc_datetime.astimezone(pytz.timezone("America/Los_Angeles"))
+        pst_date = datetime.strftime(pst_datetime, '%Y-%m-%d %I:%M %p')
 
-    address = data['text'][atIndex + 2:startBracketIndex].replace(', PORT','').strip()
+        at = 'at'
+        startBracket = '['
 
-    incidentDetails = data['text'][:atIndex - 1 ].replace('RT @pdxpolicelog: ','').strip()
+        atIndex  = data['text'].find(at)
+        startBracketIndex = data['text'].find(startBracket)
 
-    if '-' in incidentDetails:
-        incidentDetailArray = incidentDetails.split('-')
-        incidentType = incidentDetailArray[0].strip()
-        urgency = incidentDetailArray[1].strip()
-    else:
-        incidentType = incidentDetails
-        urgency = 'NOT PROVIDED'
+        address = data['text'][atIndex + 2:startBracketIndex].replace(', PORT','').strip()
 
-    cur.execute("INSERT INTO twitter.police (id, createdate, body, username, url, location, address, incident_type, urgency) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(pst_date), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), str(incidentType), str(urgency)))
-    
+        incidentDetails = data['text'][:atIndex - 1 ].replace('RT @pdxpolicelog: ','').strip()
+
+        if '-' in incidentDetails:
+            incidentDetailArray = incidentDetails.split('-')
+            incidentType = incidentDetailArray[0].strip()
+            urgency = incidentDetailArray[1].strip()
+        else:
+            incidentType = incidentDetails
+            urgency = 'NOT PROVIDED'
+
+        cur.execute("INSERT INTO twitter.police (id, createdate, body, username, url, location, address, incident_type, urgency) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(pst_date), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), str(incidentType), str(urgency)))
+        
     i = i - 1
 
 conn.commit()
