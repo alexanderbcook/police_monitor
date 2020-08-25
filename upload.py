@@ -12,7 +12,7 @@ import pytz
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 try:
-    conn = psycopg2.connect("dbname='postgres' host ='localhost'")
+    conn = psycopg2.connect("dbname='postgres'")
 except:
     print("Can't connect to PSQL!")
 try:
@@ -43,8 +43,7 @@ while i > 0:
 
     pst_datetime = utc_datetime.astimezone(pytz.timezone("America/Los_Angeles"))
     pst_date = datetime.strftime(pst_datetime, '%Y-%m-%d %I:%M %p')
-    print(pst_date)
-    print(str(pst_date))
+
     at = 'at'
     startBracket = '['
 
