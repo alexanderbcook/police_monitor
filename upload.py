@@ -81,7 +81,7 @@ while i > 0:
         try:
             cur.execute("INSERT INTO twitter.police (id, createdate, body, username, url, location, address, neighborhood, zipcode, lat, lng, incident_type, urgency) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(pst_datestring), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), geocodeJson['raw']['neighborhood'], geocodeJson['postal'], geocodeJson['lat'], geocodeJson['lng'], str(incidentType), str(urgency)))
         except:
-            cur.execute("INSERT INTO twitter.police (id, createdate, body, username, url, location, address, neighborhood, zipcode, lat, long, incident_type, urgency) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(pst_datestring), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), '','', None, None, str(incidentType), str(urgency)))
+            cur.execute("INSERT INTO twitter.police (id, createdate, body, username, url, location, address, neighborhood, zipcode, lat, lng, incident_type, urgency) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(pst_datestring), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), '','', None, None, str(incidentType), str(urgency)))
 
         
     i = i - 1
