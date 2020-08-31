@@ -14,7 +14,7 @@ from geocode import geocode
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 try:
-    conn = psycopg2.connect("dbname='postgres' host ='localhost'")
+    conn = psycopg2.connect("dbname='postgres'")
 except:
     print("Can't connect to PSQL!")
 try:
