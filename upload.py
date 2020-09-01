@@ -32,7 +32,7 @@ parser.add_argument("-q",
 args = parser.parse_args()
 
 cur = conn.cursor()
-cur.execute("CREATE TABLE IF NOT EXISTS twitter.police (id BIGINT, createdate TIMESTAMP, body VARCHAR, username VARCHAR, url VARCHAR, location VARCHAR, address VARCHAR, neighborhood VARCHAR, zipcode VARCHAR, lat NUMERIC, lng NUMERIC, incident_type VARCHAR, urgency VARCHAR)")
+cur.execute("CREATE TABLE IF NOT EXISTS twitter.police (id BIGINT, createdate TIMESTAMP, body VARCHAR, username VARCHAR, url VARCHAR, location VARCHAR, address VARCHAR, neighborhood VARCHAR, city VARCHAR, zipcode VARCHAR, lat NUMERIC, lng NUMERIC, incident_type VARCHAR, urgency VARCHAR)")
 
 i = redis.llen(args.query)
 
@@ -40,7 +40,7 @@ while i > 0:
 
     data = json.loads(redis.lpop(args.query)) 
 
-    # Check if the retweet indicator is in the text body. Do not process retweets.
+    # Check if the retweet indicator is in the text body. Do not process retweets. 
     isRetweet = False
     if 'RT @pdxpolicelog: ' in str(data['text']):
         isRetweet = True
@@ -78,10 +78,11 @@ while i > 0:
         # If geocode is successful, upload latitude, longitude, neighborhood and zip code information. Otherwise, just upload the base data.
         
         geocodeJson = geocode(address)
+        print(geocodeJson)
         try:
-            cur.execute("INSERT INTO twitter.police (id, createdate, body, username, url, location, address, neighborhood, zipcode, lat, lng, incident_type, urgency) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(pst_datestring), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), geocodeJson['raw']['neighborhood'], geocodeJson['postal'], geocodeJson['lat'], geocodeJson['lng'], str(incidentType), str(urgency)))
+            cur.execute("INSERT INTO twitter.police (id, createdate, body, username, url, location, address, neighborhood, city, zipcode, lat, lng, incident_type, urgency) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(pst_datestring), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), geocodeJson['raw']['neighborhood'], geocodeJson['city'], geocodeJson['postal'], geocodeJson['lat'], geocodeJson['lng'], str(incidentType), str(urgency)))
         except:
-            cur.execute("INSERT INTO twitter.police (id, createdate, body, username, url, location, address, neighborhood, zipcode, lat, lng, incident_type, urgency) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(pst_datestring), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), '','', None, None, str(incidentType), str(urgency)))
+            cur.execute("INSERT INTO twitter.police (id, createdate, body, username, url, location, address, neighborhood, city, zipcode, lat, lng, incident_type, urgency) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(pst_datestring), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), '','', '', None, None, str(incidentType), str(urgency)))
 
         
     i = i - 1
