@@ -1,11 +1,18 @@
-# twitter_stream
-A twitter stream which easily allows the user to gather tweets relating to a specific event or hashtag. Supports functionality to write to a csv or upload directly to a Postgres database.
+# police_listener
+A tool to monitor <a href="https://twitter.com/pdxpolicelog?lang=en">pdxpolicelog's</a> Twitter feed. 
 
-Two command line options.
+I use Redis, Tweepy, Geocoder, and a Postgres database.
 
--q specifies the query. 'cubs' will filter out all tweets other than tweets related to either bear cubs or the Chicago cubs. 'cubs, portland' will filter out all tweets other than the two given terms.
+Activate the virtual environment using:
 
--m specifies the mode. 's' will run streaming mode, which writes batches of tweets to a JSON file using Redis. Default is 'o' which is a one off run instance.
+source venv/bin/activate
+
+Then run the tool by running:
+
+python listener.py
 
 Access Twitters' developer API here: https://dev.twitter.com/
 You'll need application and developer keys.
+
+
+You can find a visualization I made with this data <a href="databyalex.com/twitter/pdxdashboard">here.</a>
