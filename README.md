@@ -9,7 +9,7 @@ source venv/bin/activate
 
 Then run the tool by running:
 
-python listener.py
+python3 listener.py
 
 Access Twitters' developer API here: https://dev.twitter.com/
 You'll need application and developer keys.
