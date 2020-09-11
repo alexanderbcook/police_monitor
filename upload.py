@@ -68,8 +68,8 @@ while i > 0:
                 incidentType = incidentDetailArray[0].strip()
                 urgency = incidentDetailArray[1].strip()
             else:
-                incidentType = incidentDetailArray[0].strip()
-                urgency = incidentDetailArray[1].strip()             
+                incidentType = incidentDetailArray[1].strip()
+                urgency = incidentDetailArray[0].strip()             
         else:
             incidentType = incidentDetails
             urgency = 'NOT PROVIDED'
