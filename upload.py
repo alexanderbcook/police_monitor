@@ -2,9 +2,6 @@ import redis
 import json
 import psycopg2
 from psycopg2 import *
-from datetime import datetime
-from pytz import timezone
-import pytz
 import geocode
 from geocode import geocode
 
@@ -23,7 +20,7 @@ i = redis.llen('event')
 
 while i > 0:
 
-    data = json.loads(redis.lpop(args.query)) 
+    data = json.loads(redis.lpop('event')) 
 
     policeTweet = False
     if str(data['username']) == 'pdxpolicelog':

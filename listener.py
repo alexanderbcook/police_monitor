@@ -5,7 +5,7 @@ import redis
 import json
 import os
 from json import dumps
-from util import connect_to_api, json_serial
+from util import connect_to_api
 from queue import Queue
 from threading import Thread
 
