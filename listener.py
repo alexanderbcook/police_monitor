@@ -35,12 +35,12 @@ class StreamListener(tweepy.StreamListener):
         tweet['location'] = jsonData['user']['location']
         json_tweet = json.dumps(tweet)
         
-        self.queue.put(redis.lpush('police', json_tweet))
+        self.queue.put(redis.lpush('event', json_tweet))
 
     def upload_tweet(self):
         while True:
             self.queue.get()
-            os.system('python upload.py -q police')
+            os.system('python upload.py -q event')
             self.queue.task_done()
 
 if __name__ == '__main__':
