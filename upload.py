@@ -1,6 +1,5 @@
 import redis
 import json
-import argparse
 import psycopg2
 from psycopg2 import *
 from datetime import datetime
@@ -8,8 +7,6 @@ from pytz import timezone
 import pytz
 import geocode
 from geocode import geocode
-
-
 
 try:
     conn = psycopg2.connect("dbname='postgres'")
@@ -20,20 +17,9 @@ try:
 except:
     print("Can't connect to Redis!")
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-q",
-                    "--queries",
-                    dest="query",
-                    help="Give names of queries stored in Redis.",
-                    default='-')
-
-args = parser.parse_args()
-
 cur = conn.cursor()
-cur.execute("CREATE TABLE IF NOT EXISTS twitter.police (id BIGINT, createdate TIMESTAMP, body VARCHAR, username VARCHAR, url VARCHAR, location VARCHAR, address VARCHAR, neighborhood VARCHAR, city VARCHAR, zipcode VARCHAR, lat NUMERIC, lng NUMERIC, incident_type VARCHAR, urgency VARCHAR)")
-cur.execute("CREATE TABLE IF NOT EXISTS twitter.fire (id BIGINT, createdate TIMESTAMP, body VARCHAR, username VARCHAR, url VARCHAR, location VARCHAR, address VARCHAR, neighborhood VARCHAR, city VARCHAR, zipcode VARCHAR, lat NUMERIC, lng NUMERIC, incident_type VARCHAR, urgency VARCHAR)")
 
-i = redis.llen(args.query)
+i = redis.llen('event')
 
 while i > 0:
 
@@ -64,6 +50,9 @@ while i > 0:
 
         if '-' in incidentDetails:
             incidentDetailArray = incidentDetails.split('-')
+
+            # Handle minor format difference.
+
             if policeTweet:
                 incidentType = incidentDetailArray[0].strip()
                 urgency = incidentDetailArray[1].strip()
@@ -79,15 +68,15 @@ while i > 0:
         geocodeJson = geocode(address)
         if policeTweet:
             try:
-                cur.execute("INSERT INTO twitter.police (id, createdate, body, username, url, location, address, neighborhood, city, zipcode, lat, lng, incident_type, urgency) VALUES (%s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), geocodeJson['raw']['neighborhood'], geocodeJson['city'], geocodeJson['postal'], geocodeJson['lat'], geocodeJson['lng'], str(incidentType), str(urgency)))
+                cur.execute("INSERT INTO twitter.police (id, createdate, body, username, address, neighborhood, city, zipcode, lat, lng, incident_type, urgency) VALUES (%s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(data['text']), str(data['username']), str(address), geocodeJson['raw']['neighborhood'], geocodeJson['city'], geocodeJson['postal'], geocodeJson['lat'], geocodeJson['lng'], str(incidentType), str(urgency)))
             except:
-                cur.execute("INSERT INTO twitter.police (id, createdate, body, username, url, location, address, neighborhood, city, zipcode, lat, lng, incident_type, urgency) VALUES (%s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), '','', '', None, None, str(incidentType), str(urgency)))
+                cur.execute("INSERT INTO twitter.police (id, createdate, body, username, address, neighborhood, city, zipcode, lat, lng, incident_type, urgency) VALUES (%s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(data['text']), str(data['username']), str(address), '','', '', None, None, str(incidentType), str(urgency)))
 
         else:
             try:
-                cur.execute("INSERT INTO twitter.fire (id, createdate, body, username, url, location, address, neighborhood, city, zipcode, lat, lng, incident_type, urgency) VALUES (%s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), geocodeJson['raw']['neighborhood'], geocodeJson['city'], geocodeJson['postal'], geocodeJson['lat'], geocodeJson['lng'], str(incidentType), str(urgency)))
+                cur.execute("INSERT INTO twitter.fire (id, createdate, body, username, address, neighborhood, city, zipcode, lat, lng, incident_type, urgency) VALUES (%s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(data['text']), str(data['username']), str(address), geocodeJson['raw']['neighborhood'], geocodeJson['city'], geocodeJson['postal'], geocodeJson['lat'], geocodeJson['lng'], str(incidentType), str(urgency)))
             except:
-                cur.execute("INSERT INTO twitter.fire (id, createdate, body, username, url, location, address, neighborhood, city, zipcode, lat, lng, incident_type, urgency) VALUES (%s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), '','', '', None, None, str(incidentType), str(urgency)))
+                cur.execute("INSERT INTO twitter.fire (id, createdate, body, username, address, neighborhood, city, zipcode, lat, lng, incident_type, urgency) VALUES (%s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(data['text']), str(data['username']) str(address), '','', '', None, None, str(incidentType), str(urgency)))
 
 
     i = i - 1

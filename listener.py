@@ -31,8 +31,6 @@ class StreamListener(tweepy.StreamListener):
         tweet['id'] = jsonData['id_str']
         tweet['text'] = jsonData['text']
         tweet['username'] = jsonData['user']['screen_name']
-        tweet['url'] = jsonData['user']['url']
-        tweet['location'] = jsonData['user']['location']
         json_tweet = json.dumps(tweet)
         
         self.queue.put(redis.lpush('event', json_tweet))
