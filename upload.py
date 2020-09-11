@@ -39,6 +39,10 @@ while i > 0:
 
     data = json.loads(redis.lpop(args.query)) 
 
+    policeTweet = False
+    if str(data['username']) == 'pdxpolicelog':
+        policeTweet = True
+
     # Check if the retweet indicator is in the text body. Do not process retweets. 
     isRetweet = False
     if 'RT @pdxpolicelog: ' in str(data['text']):
@@ -60,8 +64,12 @@ while i > 0:
 
         if '-' in incidentDetails:
             incidentDetailArray = incidentDetails.split('-')
-            incidentType = incidentDetailArray[0].strip()
-            urgency = incidentDetailArray[1].strip()
+            if policeTweet:
+                incidentType = incidentDetailArray[0].strip()
+                urgency = incidentDetailArray[1].strip()
+            else:
+                incidentType = incidentDetailArray[0].strip()
+                urgency = incidentDetailArray[1].strip()             
         else:
             incidentType = incidentDetails
             urgency = 'NOT PROVIDED'
@@ -69,13 +77,13 @@ while i > 0:
         # If geocode is successful, upload latitude, longitude, neighborhood and zip code information. Otherwise, just upload the base data.
         
         geocodeJson = geocode(address)
-        if str(data['username']) == 'pdxpolicelog':
+        if policeTweet:
             try:
                 cur.execute("INSERT INTO twitter.police (id, createdate, body, username, url, location, address, neighborhood, city, zipcode, lat, lng, incident_type, urgency) VALUES (%s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), geocodeJson['raw']['neighborhood'], geocodeJson['city'], geocodeJson['postal'], geocodeJson['lat'], geocodeJson['lng'], str(incidentType), str(urgency)))
             except:
                 cur.execute("INSERT INTO twitter.police (id, createdate, body, username, url, location, address, neighborhood, city, zipcode, lat, lng, incident_type, urgency) VALUES (%s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), '','', '', None, None, str(incidentType), str(urgency)))
 
-        if str(data['username']) == 'pdxfirelog':
+        else:
             try:
                 cur.execute("INSERT INTO twitter.fire (id, createdate, body, username, url, location, address, neighborhood, city, zipcode, lat, lng, incident_type, urgency) VALUES (%s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (str(data['id']), str(data['text']), str(data['username']), str(data['url']), str(data['location']), str(address), geocodeJson['raw']['neighborhood'], geocodeJson['city'], geocodeJson['postal'], geocodeJson['lat'], geocodeJson['lng'], str(incidentType), str(urgency)))
             except:
