@@ -7,6 +7,7 @@ def geocode(unformattedAddress):
 
     g = geocoder.mapbox(address, proximity=mapBias, maxRows=1, key='pk.eyJ1IjoiYWJjb29rIiwiYSI6ImNqcnp5N3N2ZzFkeWs0NG80bnVtNmFxaDEifQ.zPkUuVuuVNGg-3DkQcBflQ')
     return g.json
+    
 def formatAddress(unformattedAddress):
 
     formattedAddress = unformattedAddress.replace(' NE ', ' NORTHEAST ')
@@ -15,7 +16,7 @@ def formatAddress(unformattedAddress):
     formattedAddress.replace(' SW ',' SOUTHWEST ')
     formattedAddress.replace(' S ',' SOUTH ')
     formattedAddress.replace(' N ',' NORTH ')
-    formattedAddress.replace(' / ', ' & ')
+    formattedAddress.replace(' / ', ' and ')
     formattedAddress +', PORTLAND, OREGON'
 
     return formattedAddress
